@@ -1,0 +1,102 @@
+``from random import randint
+
+# Lista de NPCs
+lista_npcs = []
+
+# Player com atributos
+player = {
+    "nome": "balbuena",
+    "level": 1,
+    "exp": 0,
+    "exp_max": 10,
+    "hp": 380,
+    "hp_max": 900,
+    "dano": 50,
+}
+
+# Função para criar NPCs
+def criar_npc(qtd):
+    for _ in range(qtd):
+        level = randint(0, 30)
+        novo_npc = {
+            "nome": f"npc #{level}",
+            "level": level,
+            "dano": 5 * level,
+            "hp": 20 * level,
+            "exp": 3 * level,
+            "hp_max": 20 * level
+        }
+        lista_npcs.append(novo_npc)
+
+# Função para exibir NPCs
+def exibir_npcs():
+    for npc in lista_npcs:
+        exibir_npc(npc)
+
+def exibir_npc(npc):
+    print(f"nome: {npc['nome']} // level: {npc['level']} // dano: {npc['dano']} // hp: {npc['hp']} // exp: {npc['exp']}")
+
+def exibir_player():
+    print(f"nome: {player['nome']} // level: {player['level']} // dano: {player['dano']} // hp: {player['hp']}/{player['hp_max']} // exp: {player['exp']}/{player['exp_max']}")
+
+# Função para gerar NPCs
+def gerar_npcs(n_npcs):
+    lista_npcs.clear()  # Limpa a lista antes de gerar novos NPCs
+    criar_npc(n_npcs)
+
+def reset_player():
+    player['hp'] = player['hp_max']
+
+def reset_npc(npc):
+    npc['hp'] = npc['hp_max']
+
+def level_up():
+    while player['exp'] >= player['exp_max']:
+        player['level'] += 1
+        player['exp'] -= player['exp_max']  # Mantém a experiência que sobrou
+        player['exp_max'] *= 2  # Aumenta a experiência máxima
+        player['hp_max'] += 20  # Aumenta o HP máximo
+        player['hp'] = player['hp_max']  # Restaura o HP atual para o máximo
+        print(f"{player['nome']} subiu para o nível {player['level']}!")
+
+# Função para iniciar a batalha
+def iniciar_batalha(npc):
+    reset_npc(npc)  # Reseta o HP do NPC antes da batalha
+    while player['hp'] > 0 and npc['hp'] > 0:
+        atacar_npc(npc)
+        if npc['hp'] > 0:  # Verifica se o NPC ainda está vivo
+            atacar_player(npc)
+        exibir_info_batalha(npc)
+
+    if player['hp'] > 0:
+        print(f"{player['nome']} venceu e ganhou {npc['exp']} de exp!")
+        player['exp'] += npc['exp']  # Adiciona a experiência do NPC ao jogador
+        level_up()  # Verifica e atualiza o nível do jogador após a batalha
+        exibir_player()  # Exibe as informações atualizadas do jogador
+    else:
+        print(f"{npc['nome']} venceu! Você foi derrotado.")
+
+# Função para atacar NPC
+def atacar_npc(npc):
+    npc['hp'] -= player['dano']
+
+# Função para atacar o jogador
+def atacar_player(npc):
+    player['hp'] -= npc['dano']
+
+# Função para exibir informações da batalha
+def exibir_info_batalha(npc):
+    print(f"Player HP: {player['hp']} / {player['hp_max']}")
+    print(f"NPC: {npc['nome']} HP: {npc['hp']} / {npc['hp_max']}")
+    print('---------------------\n')
+
+# Exemplo de uso: gerar e exibir 5 NPCs
+gerar_npcs(5)
+exibir_npcs()
+
+# Seleciona o primeiro NPC da lista para batalhar
+if lista_npcs:  # Verifica se a lista de NPCs não está vazia
+    npc_selecionado = lista_npcs[0]
+    iniciar_batalha(npc_selecionado)
+else:
+    print("Nenhum NPC disponível para batalha.")
